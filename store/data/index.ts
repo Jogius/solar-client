@@ -2,6 +2,7 @@ interface Data {
   id: number
   flowtemp: number
   refluxtemp: number
+  solaryield?: number
   timestamp: string
 }
 

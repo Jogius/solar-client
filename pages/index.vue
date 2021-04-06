@@ -87,6 +87,22 @@
       </v-menu>
       <v-spacer />
     </v-row>
+    <v-row>
+      <v-spacer />
+      <v-text-field
+        v-model="solarYieldSum"
+        readonly
+        label="Summe des Solarertrages im Zeitraum in Wh"
+      />
+      <v-spacer />
+      <v-spacer />
+      <v-text-field
+        v-model="flowSpeed"
+        type="number"
+        label="Pumpgeschwindigkeit im Liter pro Minute"
+      />
+      <v-spacer />
+    </v-row>
   </v-container>
 </template>
 
@@ -148,6 +164,8 @@ export default {
   data() {
     return {
       data: [],
+      solarYieldSum: 0,
+      flowSpeed: 3,
       startDate: new Date(new Date().setDate(new Date().getDate() - 1))
         .toISOString()
         .substring(0, 10),
@@ -174,6 +192,8 @@ export default {
     const data = this.getFilteredData(this.$store.state.data.data)
     const labels = this.getLabels(data)
 
+    let tempSolarYieldSum = 0
+
     // Create chart
     const ctx = document.getElementById('chart').getContext('2d')
     this.chart = new Chart(ctx, {
@@ -195,18 +215,11 @@ export default {
           },
           {
             label: 'Ertrag in Wh',
-            data: data.map(
-              ({ flowtemp, refluxtemp }) =>
-                -0.00064 +
-                ((((1.03392 +
-                  0.00055 * (refluxtemp - 20) +
-                  0.000002 * (refluxtemp - 20)) ^
-                  2) *
-                  (flowtemp - refluxtemp) +
-                  0.00057 * (flowtemp - refluxtemp)) ^
-                  2) *
-                  3
-            ),
+            data: data.map(({ solaryield }) => {
+              const speed = solaryield * this.flowSpeed
+              tempSolarYieldSum += speed
+              return speed
+            }),
             backgroundColor: '#0000ff',
             borderColor: '#0000ff',
           },
@@ -220,6 +233,7 @@ export default {
         },
       },
     })
+    this.solarYieldSum = tempSolarYieldSum
   },
   updated() {
     this.refresh()
@@ -241,6 +255,8 @@ export default {
       const data = this.getFilteredData(this.$store.state.data.data)
       const labels = this.getLabels(data)
 
+      let tempSolarYieldSum = 0
+
       this.chart.data.labels = labels
       this.chart.data.datasets = [
         {
@@ -257,22 +273,17 @@ export default {
         },
         {
           label: 'Ertrag in Wh',
-          data: data.map(
-            ({ flowtemp, refluxtemp }) =>
-              -0.00064 +
-              ((((1.03392 +
-                0.00055 * (refluxtemp - 20) +
-                0.000002 * (refluxtemp - 20)) ^
-                2) *
-                (flowtemp - refluxtemp) +
-                0.00057 * (flowtemp - refluxtemp)) ^
-                2)
-          ),
+          data: data.map(({ solaryield }) => {
+            const speed = solaryield * this.flowSpeed
+            tempSolarYieldSum += speed
+            return speed
+          }),
           backgroundColor: '#0000ff',
           borderColor: '#0000ff',
         },
       ]
       this.chart.update()
+      this.solarYieldSum = tempSolarYieldSum
     },
   },
 }
@@ -283,6 +294,6 @@ export default {
   margin: 20px;
 }
 #chart {
-  max-height: 75vh;
+  max-height: 70vh;
 }
 </style>

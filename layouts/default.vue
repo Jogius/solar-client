@@ -35,8 +35,16 @@ export default {
       const fetchedData = await this.$axios.$get(
         'https://solar.themakowskis.de/api/find'
       )
+      // fetchedData = fetchedData.filter(({ id }) => id % 5 === 0)
       fetchedData.forEach((data) => {
+        data.status = data.status > 0 ? 1 : 0
         data.timestamp += ' UTC'
+        data.solaryield =
+          -0.00064 +
+          (1.03392 +
+            0.00055 * (data.refluxtemp - 20) +
+            0.000002 * Math.pow(data.refluxtemp - 20, 2)) +
+          0.00057 * Math.pow(data.flowtemp - data.refluxtemp, 2)
       })
       this.$store.commit('data/setData', fetchedData)
     },

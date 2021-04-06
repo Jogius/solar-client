@@ -9,8 +9,8 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - typescript-nuxt-vuetify',
-    title: 'typescript-nuxt-vuetify',
+    titleTemplate: '%s - TheMakowskis Solarertrag',
+    title: 'TheMakowskis Solarertrag',
     htmlAttrs: {
       lang: 'en',
     },
